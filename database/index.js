@@ -2,7 +2,7 @@ const books = [
 {
 	ISBN:"12345ONE",
 	title:"Starting with MERN",
-	authors:["Pavan"],
+	authors:[1,2],
 	language:"en",
 	pubDate:"2021-07-07",
 	category:["fiction","Programming","DBMS","Web Dev"],
@@ -12,7 +12,7 @@ const books = [
 {
 	ISBN:"12345TWO",
 	title:"Starting with Python",
-	authors:["Deepak"],
+	authors:[1],
 	language:"en",
 	pubDate:"2021-07-07",
 	category:["fiction","Programming","DBMS","Web Dev"],
