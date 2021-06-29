@@ -254,6 +254,8 @@ database.authors.forEach((author)=>{
 });
 });
 
+
+//Rechecking Required
 /*
 Route  				/publication/:id
 Description        Update publication name
@@ -264,10 +266,50 @@ Method                PUT
 shapeAI.put("/publication/update/:id",(req,res)=>{
 database.publications.forEach((publication)=>{
 	if(publication.id===req.params.id) {
-		publication.id=req.body.publicationName;
+		publication.name=req.body.publicationName;
 		return;
 	}
 });
 });
 
+/*
+Route  				/publication/book/:isbn
+Description        add new publication
+Access                PUBLIC
+Parameters            isbn
+Method                PUT
+*/
+shapeAI.put("/publication/book/update/:isbn",(req,res)=>{
+database.publications.forEach((publication)=>{
+	if(publication.id===req.params.isbn) return publication.publications.push(req.body.NewBook);
+});
+database.books.forEach((book)=>{
+	if(book.ISBN===req.params.NewBook) return book.books.push(req.body.isbn);
+});
+return res.json({publication:database.publications,book:database.books,message:"New publication added"});
+});
+
+/*
+Route  				/publication/update/book
+Description        update/add new book to a publication
+Access                PUBLIC
+Parameters            isbn
+Method                PUT
+*/
+shapeAI.put("/publication/update/book/:isbn",(req,res)=>{
+	//Update the publication database
+	database.publications.forEach((publication)=>{
+		if(publication.id===req.body.pubId){
+			return publication.books.push(req.params.isbn);
+		}
+	});
+	//update books database
+	database.books.forEach((book)=>{
+		if(book.ISBN===req.params.isbn){
+			book.publication=req.body.pubId;
+			return ;
+		}
+	});
+	return res.json({books:database.books,publications:database.publications,message:"Successfully updated publication"});
+})
 shapeAI.listen(3000,()=>console.log("Server is running"));

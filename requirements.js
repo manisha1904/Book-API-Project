@@ -52,7 +52,7 @@
 //POST               Done
 //New author
 
-//PUT
+//PUT                Done
 //Author Details
 
 //DELETE
