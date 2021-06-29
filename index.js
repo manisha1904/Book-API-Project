@@ -254,8 +254,6 @@ database.authors.forEach((author)=>{
 });
 });
 
-
-//Rechecking Required
 /*
 Route  				/publication/:id
 Description        Update publication name
@@ -272,22 +270,6 @@ database.publications.forEach((publication)=>{
 });
 });
 
-/*
-Route  				/publication/book/:isbn
-Description        add new publication
-Access                PUBLIC
-Parameters            isbn
-Method                PUT
-*/
-shapeAI.put("/publication/book/update/:isbn",(req,res)=>{
-database.publications.forEach((publication)=>{
-	if(publication.id===req.params.isbn) return publication.publications.push(req.body.NewBook);
-});
-database.books.forEach((book)=>{
-	if(book.ISBN===req.params.NewBook) return book.books.push(req.body.isbn);
-});
-return res.json({publication:database.publications,book:database.books,message:"New publication added"});
-});
 
 /*
 Route  				/publication/update/book
@@ -311,5 +293,101 @@ shapeAI.put("/publication/update/book/:isbn",(req,res)=>{
 		}
 	});
 	return res.json({books:database.books,publications:database.publications,message:"Successfully updated publication"});
-})
+});
+
+/*
+Route  				/book/delete
+Description        delete a book
+Access                PUBLIC
+Parameters            isbn
+Method                DELETE
+*/
+shapeAI.delete("/book/delete/:isbn",(req,res)=>{
+	const updatedBookDatabase = database.books.filter((book)=>
+		book.ISBN !== req.params.isbn
+	);
+	database.books = updatedBookDatabase;
+	return res.json({books:database.books});
+});
+
+/*
+Route  				/book/delete/author
+Description        delete an author 
+Access                PUBLIC
+Parameters            isbn, author id
+Method                DELETE
+*/
+shapeAI.delete("/book/delete/author/:isbn/:authorId",(req,res)=>{
+	//update book database
+	database.books.forEach((book)=>{
+		if(book.ISBN===req.params.isbn){
+			const newAuthorList = book.authors.filter((author)=>author !== parseInt(req.params.authorId));
+				book.authors = newAuthorList;
+				return;
+		}
+	});
+	//update author database
+	database.authors.forEach((author)=>{
+		if(author.id===parseInt(req.params.authorId)){
+			const newBooksList = author.books.filter((book)=>book !== req.params.isbn);
+		author.books=newBooksList;
+		return;
+		}
+	});
+
+return res.json({book:database.books,author:database.authors,message:"Deleted the author"});
+
+});
+
+/*
+Route  				/delete/author
+Description        delete an author 
+Access                PUBLIC
+Parameters            author id
+Method                DELETE
+*/
+shapeAI.delete("/delete/author/:authorid",(req,res)=>{
+	const updatedAuthorsList = database.authors.filter((author)=>author.id!==parseInt(req.params.authorid));
+	database.authors=updatedAuthorsList;
+	return res.json({authors:database.authors,message:"Author deleted"});
+});
+
+/*
+Route  				/delete/publication
+Description        delete a publication
+Access                PUBLIC
+Parameters            publication id
+Method                DELETE
+*/
+shapeAI.delete("/delete/publication/:pubId",(req,res)=>{
+	const updatedPublications = database.publications.filter((publication)=> publication.id!==parseInt(req.params.pubId));
+	database.publications=updatedPublications;
+	return res.json({publication:database.publications,message:"Deleted publications"});
+});
+
+/*
+Route  				/publication/delete/book
+Description        delete a publication
+Access                PUBLIC
+Parameters            publication id, isbn
+Method                DELETE
+*/
+shapeAI.delete("/delete/publication/:pubid/:isbn",(req,res)=>{
+	//update publication database
+	database.publications.forEach((publication)=>{
+		if(publication.id===parseInt(req.params.pubid)){
+			const newPublicationList = publication.books.filter((book)=>book !==req.params.isbn);
+				publication.books = newPublicationList;
+				return;
+		}
+	});
+	//update book database
+	database.books.forEach((book)=>{
+		if(book.ISBN===req.params.isbn){
+			book.publication = 0; //No publication available
+			return;
+		}
+	});
+	return res.json({books:database.books,publications:database.publications,message:"Deleted publication"});
+});
 shapeAI.listen(3000,()=>console.log("Server is running"));
