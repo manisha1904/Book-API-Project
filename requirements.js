@@ -35,8 +35,8 @@
 //Update/add new author   Done
 
 //Delete
-//Delete a book
-//delete an author from a book
+//Delete a book           Done
+//delete an author from a book     Done
 
 
 /**************************************************/
@@ -56,7 +56,7 @@
 //Author Details
 
 //DELETE
-//delete an author
+//delete an author      Done
 
 
 /***********************************************/
@@ -65,17 +65,17 @@
 //We need an api
 
 //GET
-//to get all Publications       Done
-//to get specific publications   Done
-//to get a list of publications based on a book  Done
+//to get all Publications                      Done
+//to get specific publications         Done
+//to get a list of publications based on a book      Done
 
 //POST                         Done
 //Add new publications
 
 //PUT
-//Update publications details
-//Update/add new book to an publication
+//Update publications details                  Done
+//Update/add new book to an publication        Done
 
 //DELETE
-//delete a book from publication
-//delete a publication
+//delete a book from publication       Done
+//delete a publication               Done
