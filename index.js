@@ -361,12 +361,18 @@ Access                PUBLIC
 Parameters            isbn
 Method                DELETE
 */
-shapeAI.delete("/book/delete/:isbn",(req,res)=>{
-	const updatedBookDatabase = database.books.filter((book)=>
+shapeAI.delete("/book/delete/:isbn",async(req,res)=>{
+	const updatedBookDatabase = await BookModel.findOneAndDelete(
+	{
+		ISBN:req.params.isbn,
+	});
+
+	/*const updatedBookDatabase = database.books.filter((book)=>
 		book.ISBN !== req.params.isbn
 	);
 	database.books = updatedBookDatabase;
-	return res.json({books:database.books});
+	return res.json({books:database.books});*/
+	return res.json({books:updatedBookDatabase});
 });
 
 /*
@@ -376,25 +382,45 @@ Access                PUBLIC
 Parameters            isbn, author id
 Method                DELETE
 */
-shapeAI.delete("/book/delete/author/:isbn/:authorId",(req,res)=>{
+shapeAI.delete("/book/delete/author/:isbn/:authorId",async(req,res)=>{
 	//update book database
-	database.books.forEach((book)=>{
+	const updatedBook =  await BookModel.findOneAndUpdate(
+	{
+		ISBN:req.params.isbn,
+	},{
+		$pull:{
+			authors:parseInt(req.params.authorId),
+		},
+	});
+	/*database.books.forEach((book)=>{
 		if(book.ISBN===req.params.isbn){
 			const newAuthorList = book.authors.filter((author)=>author !== parseInt(req.params.authorId));
 				book.authors = newAuthorList;
 				return;
 		}
-	});
+	});*/
 	//update author database
-	database.authors.forEach((author)=>{
+	const updatedAuthor = await AuthorModel.findOneAndUpdate({
+		id:parseInt(req.params.authorId),
+	},
+	{
+		$pull:{
+			books:req.params.isbn,
+		},
+	},
+		{
+			new:true,
+		},
+	);
+	/*database.authors.forEach((author)=>{
 		if(author.id===parseInt(req.params.authorId)){
 			const newBooksList = author.books.filter((book)=>book !== req.params.isbn);
 		author.books=newBooksList;
 		return;
 		}
-	});
+	});*/
 
-return res.json({book:database.books,author:database.authors,message:"Deleted the author"});
+return res.json({book:updatedBook,author:updatedAuthor,message:"Deleted the author"});
 
 });
 
