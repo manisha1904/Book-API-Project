@@ -4,6 +4,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 //Database
 const database = require("./database/index");
+
+//Models
+const BookModel = require("./database/book");
+const AuthorModel = require("./database/author");
+const PublicationModel = require("./database/publication");
 //Initializing
 const shapeAI = express();
 
@@ -27,8 +32,10 @@ Access                PUBLIC
 Parameters            NONE
 Method                GET
 */
-shapeAI.get("/",(req,res)=>{
-	return res.json({books:database.books});
+//await not working
+shapeAI.get("/", async (req,res)=>{
+	const getAllBooks = await BookModel.find();
+	return res.json(getAllBooks);
 });
 
 /*
@@ -38,10 +45,11 @@ Access                PUBLIC
 Parameters            isbn
 Method                GET
 */
-shapeAI.get("/is/:isbn",(req,res)=>{
-	const getSpecificBook= database.books.filter((book)=> book.ISBN === req.params.isbn);
-	if(getSpecificBook.length===0){
-		return res.json({error:`No Book found of ISBN ${req.params.isbn}`});
+shapeAI.get("/is/:isbn",async (req,res)=>{
+	const getSpecificBook = await BookModel.findOne({ISBN: req.params.isbn});
+	//const getSpecificBook= database.books.filter((book)=> book.ISBN === req.params.isbn);
+	if(!getSpecificBook){
+		return res.json({error:`No Book found of ISBN ${req.params.isbn}`,});
 	}
 	return res.json({book:getSpecificBook});
 });
@@ -53,12 +61,13 @@ Access                PUBLIC
 Parameters            category
 Method                GET
 */
-shapeAI.get("/c/:category", (req,res)=>{
-	const getSpecificBooks= database.books.filter((book)=> book.category.includes(req.params.category));
-	if(getSpecificBooks.length===0){
-		return res.json({error:`No Book found of category ${req.params.category}`});
+shapeAI.get("/c/:category", async (req,res)=>{
+	const getSpecificBooks= await BookModel.findOne({category:req.params.category,});
+	//const getSpecificBooks= database.books.filter((book)=> book.category.includes(req.params.category));
+	if(!getSpecificBooks){
+		return res.json({error:`No Book found of category ${req.params.category}`,});
 	}
-	return res.json({book:getSpecificBooks});
+	return res.json({books:getSpecificBooks});
 
 });
 
@@ -85,8 +94,9 @@ Access                PUBLIC
 Parameters            None
 Method                GET
 */
-shapeAI.get("/a",(req,res)=>{
-	return res.json({authors:database.authors});
+shapeAI.get("/a",async(req,res)=>{
+	const getAllAuthors = await AuthorModel.find();
+	return res.json({authors:getAllAuthors});
 });
 
 /*
@@ -170,16 +180,17 @@ Access                PUBLIC
 Parameters            NONE 
 Method                POST
 */
-shapeAI.post("/book/new",(req,res)=>{
+shapeAI.post("/book/new",async (req,res)=>{
 	//body
 	const {newBook} = req.body;
-	database.books.push(newBook);
-	return res.json({books:database.books,message:"New book added"});
+	//database.books.push(newBook);
+	BookModel.create(newBook);
+	return res.json({message:"New book added"});
 
 });
 
 /*
-Route  				/author/new
+Route  							/author/new
 Description        add new author
 Access                PUBLIC
 Parameters            NONE 
@@ -188,8 +199,9 @@ Method                POST
 shapeAI.post("/author/new",(req,res)=>{
 	//body
 	const {newAuthor} = req.body;
-	database.authors.push(newAuthor);
-	return res.json({Authors:database.authors,message:"New Author added"});
+	//database.authors.push(newAuthor);
+	AuthorModel.create(newAuthor);
+	return res.json({message:"New Author added"});
 
 });
 
@@ -213,20 +225,31 @@ Access                PUBLIC
 Parameters            isbn 
 Method                PUT
 */
-shapeAI.put("/book/update/:isbn",(req,res)=>{
+shapeAI.put("/book/update/:isbn",async(req,res)=>{
 	//foreach directly updates the array
 					//or
 	//map => new array =>replace
-
-	database.books.forEach((book)=>{
+	const updatedBook= await BookModel.findOneAndUpdate(
+	{
+		ISBN:req.params.isbn,
+	},
+	{
+		title:req.body.bookTitle,
+	},
+	{
+		new:true,
+	}
+	);
+	/*database.books.forEach((book)=>{
 		if(book.ISBN===req.params.isbn)
 		{
 			book.title=req.body.bookTitle;
 			return;
 		}
-	});
+	});*/
 
-return res.json({books:database.books});
+//return res.json({books:database.books});
+return res.json({books:updatedBook});
 });
 
 /*
