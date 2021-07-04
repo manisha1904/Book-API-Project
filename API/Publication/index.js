@@ -13,8 +13,9 @@ Access                PUBLIC
 Parameters            NONE
 Method                GET
 */
-Router.get("/p",(req,res)=>{
-	return res.json({publications:database.publications});
+Router.get("/",async(req,res)=>{
+	const getAllPublications = await PublicationModel.find();
+	return res.json({authors:getAllPublications});
 });
 
 /*
